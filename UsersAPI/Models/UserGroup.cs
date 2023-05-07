@@ -2,6 +2,9 @@
 {
     public class UserGroup
     {
+        public UserGroup()
+        {
+        }
         /// <summary>
         /// Конструктор для создание группы пользователя
         /// </summary>

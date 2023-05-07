@@ -14,14 +14,5 @@
         public DbSet<User> Users { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<UserState> UserStates { get; set; }
-
-        // Настройка моделей БД
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>().HasOne<UserGroup>();
-            modelBuilder.Entity<User>().HasOne<UserState>();
-
-            base.OnModelCreating(modelBuilder);
-        }
     }
 }

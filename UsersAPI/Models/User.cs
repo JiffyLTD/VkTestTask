@@ -1,7 +1,12 @@
-﻿namespace UsersAPI.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace UsersAPI.Models
 {
     public class User
     {
+        public User()
+        {
+        }
         /// <summary>
         /// Конструтор для создания пользователя
         /// </summary>
@@ -47,8 +52,10 @@
         public string Login { get; set; } = null!;
         public string Password { get; set; } = null!;
         public DateTime CreatedDate { get; set; }
+        [ForeignKey("UserGroup")]
         public Guid UserGroupId { get; set; }
         public UserGroup UserGroup { get; set; }
+        [ForeignKey("UserState")]
         public Guid UserStateId { get; set; }
         public UserState UserState { get; set; }
     }
