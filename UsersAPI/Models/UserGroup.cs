@@ -2,6 +2,7 @@
 {
     public class UserGroup
     {
+        // Конструктор без параметров для EntityFramework
         public UserGroup()
         {
         }

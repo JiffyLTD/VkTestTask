@@ -4,6 +4,7 @@ namespace UsersAPI.Models
 {
     public class User
     {
+        // Конструктор без параметров для EntityFramework
         public User()
         {
         }

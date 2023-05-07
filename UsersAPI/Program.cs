@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UsersAPI.DbContext;
+using UsersAPI.Repositories;
+using UsersAPI.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,9 @@ builder.Services.AddSwaggerGen();
 // Подключение БД
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Регистрируем сервис
+builder.Services.AddScoped<IUser, UserRepository>();
 
 var app = builder.Build();
 
