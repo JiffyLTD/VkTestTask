@@ -57,15 +57,43 @@ namespace UsersAPI.Controllers
         {
             if (await _userValidator.AdditionIsComplete(model.Login))
             {
-                var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+                if (model.IsAdmin) 
+                {
+                    if (await _userValidator.AdminPlaceIsEmpty())
+                    {
+                        var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
 
-                if (result.Status)
-                    return Results.Ok(result);
+                        if (result.Status)
+                            return Results.Ok(result);
+                        else
+                            return Results.Problem(result.Message);
+                    }
+
+                    return Results.BadRequest("Ошибка создания. Количество администраторов в системе не более 1");
+                }
                 else
-                    return Results.Problem(result.Message);
+                {
+                    var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+
+                    if (result.Status)
+                        return Results.Ok(result);
+                    else
+                        return Results.Problem(result.Message);
+                }
             }
 
-            return Results.Problem("Ошибка создания. Повторите попытку позже");
+            return Results.BadRequest("Ошибка создания. Повторите попытку позже");
+        }
+
+        [HttpDelete("")]
+        public async Task<IResult> DeleteUser(Guid id)
+        {
+            var result = await _iUser.DeleteUser(id);
+
+            if(result.Status)
+                return Results.Ok(result);
+            else
+                return Results.Problem(result.Message);
         }
     }
 }

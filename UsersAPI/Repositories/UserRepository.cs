@@ -31,14 +31,20 @@ namespace UsersAPI.Repositories
             }
         }
 
-        public async Task<Response> DeleteUser(User user)
+        public async Task<Response> DeleteUser(Guid id)
         {
             try
             {
-                user.UserState.Code = "Blocked";
-                await _db.SaveChangesAsync();
+                var user = await _db.Users.Include(x => x.UserState).FirstOrDefaultAsync(x => x.Id == id);
+                if (user != null)
+                {
+                    user.UserState.Code = "Blocked";
+                    await _db.SaveChangesAsync();
 
-                return new Response("Пользователь успешно удален", true, user);
+                    return new Response("Пользователь успешно удален", true, user);
+                }
+
+                return new Response("Пользователь не найден", false);
             }
             catch (Exception ex)
             {
@@ -120,6 +126,14 @@ namespace UsersAPI.Repositories
             {
                 return new Response(ex.Message, false);
             }
+        }
+
+        public async Task<int> NumOfAdmins()
+        {
+            var allAdmins = await _db.Users.Include(x => x.UserGroup).
+                Where(x => x.UserGroup.Code == "Admin").ToListAsync();
+
+            return allAdmins.Count;
         }
     }
 }

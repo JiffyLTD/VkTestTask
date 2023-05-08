@@ -29,7 +29,12 @@ namespace UsersAPI.Validations
 
         private static bool AdditionTimeIsOver(DateTime userCreatedDate)
         {
-            return userCreatedDate.Second - DateTime.Now.Second > 5;
+            return userCreatedDate < DateTime.Now.AddSeconds(-5);
+        }
+
+        public async Task<bool> AdminPlaceIsEmpty()
+        {
+            return await _iUser.NumOfAdmins() < 1;
         }
     }
 }

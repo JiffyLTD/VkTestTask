@@ -5,11 +5,18 @@ namespace UsersAPI.Repositories.Interfaces
     public interface IUser
     {
         /// <summary>
+        /// Получение количества админов
+        /// </summary>
+        /// <returns>Количество админов в системе</returns>
+        public Task<int> NumOfAdmins();
+
+        /// <summary>
         /// Получение последнего добавленного(по времени создания) пользователя
         /// </summary>
         /// <param name="login">Логин пользователя</param>
         /// <returns>Объект Response</returns>
         public Task<Response> GetLastUserByLogin(string login);
+
         /// <summary>
         /// Получение пользователя по его ID
         /// </summary>
@@ -41,10 +48,10 @@ namespace UsersAPI.Repositories.Interfaces
         public Task<Response> AddUser(string login, string password, bool isAdmin);
 
         /// <summary>
-        /// Удаление пользователя
+        /// Мягкое удаление пользователя
         /// </summary>
-        /// <param name="user">Объект пользователь</param>
+        /// <param name="id">ID пользователя</param>
         /// <returns>Объект Response</returns>
-        public Task<Response> DeleteUser(User user); 
+        public Task<Response> DeleteUser(Guid id); 
     }
 }
