@@ -52,34 +52,39 @@ namespace UsersAPI.Controllers
                 return Results.NotFound(result.Message);
         }
 
-        [HttpPost("")]
+        [HttpPost("")] // не хватает опыта чтобы красиво расписать метод:(
         public async Task<IResult> AddUser(RegisterFormViewModel model)
         {
-            if (await _userValidator.AdditionIsComplete(model.Login))
+            if (await _userValidator.AdditionIsComplete(model.Login)) // проверка завершения создания
             {
-                if (model.IsAdmin) 
+                if (await _userValidator.LoginIsUniq(model.Login)) // проверка уникальности логина
                 {
-                    if (await _userValidator.AdminPlaceIsEmpty())
+                    if (model.IsAdmin) // если пользователь указал что будет админом
+                    {
+                        if (await _userValidator.AdminPlaceIsEmpty()) // проверка есть ли админы в системе
+                        {
+                            var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+
+                            if (result.Status)
+                                return Results.Ok(result);
+                            else
+                                return Results.Problem(result.Message);
+                        }
+
+                        return Results.BadRequest("Ошибка создания. Количество администраторов в системе не более 1");
+                    }
+                    else // если пользователь указал что не будет админом
                     {
                         var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
 
-                        if (result.Status)
+                        if (result.Status)  
                             return Results.Ok(result);
                         else
                             return Results.Problem(result.Message);
                     }
-
-                    return Results.BadRequest("Ошибка создания. Количество администраторов в системе не более 1");
                 }
-                else
-                {
-                    var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
 
-                    if (result.Status)
-                        return Results.Ok(result);
-                    else
-                        return Results.Problem(result.Message);
-                }
+                return Results.BadRequest("Ошибка создания. Данный логин уже занят");
             }
 
             return Results.BadRequest("Ошибка создания. Повторите попытку позже");

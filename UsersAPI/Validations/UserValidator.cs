@@ -36,5 +36,15 @@ namespace UsersAPI.Validations
         {
             return await _iUser.NumOfAdmins() < 1;
         }
+
+        public async Task<bool> LoginIsUniq(string login)
+        {
+            var result = await _iUser.GetLastUserByLogin(login);
+
+            if (result.Status)
+                return false; 
+            else
+                return true;
+        }
     }
 }

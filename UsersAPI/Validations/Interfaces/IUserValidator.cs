@@ -14,5 +14,12 @@
         /// </summary>
         /// <returns>Админов в системе более 1 или нет</returns>
         public Task<bool> AdminPlaceIsEmpty();
+
+        /// <summary>
+        /// Проверка логина на уникальность
+        /// </summary>
+        /// <param name="login">Логин пользователя</param>
+        /// <returns>Уникальный ли логин в системе</returns>
+        public Task<bool> LoginIsUniq(string login);
     }
 }
