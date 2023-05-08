@@ -5,11 +5,17 @@ namespace UsersAPI.Repositories.Interfaces
     public interface IUser
     {
         /// <summary>
-        /// Получение пользователя по его логину
+        /// Получение последнего добавленного(по времени создания) пользователя
         /// </summary>
         /// <param name="login">Логин пользователя</param>
         /// <returns>Объект Response</returns>
-        public Task<Response> GetUserByLogin(string login);
+        public Task<Response> GetLastUserByLogin(string login);
+        /// <summary>
+        /// Получение пользователя по его ID
+        /// </summary>
+        /// <param name="id">ID пользователя</param>
+        /// <returns>Объект Response</returns>
+        public Task<Response> GetUserById(Guid id);
 
         /// <summary>
         /// Получение всех пользователей
@@ -26,11 +32,13 @@ namespace UsersAPI.Repositories.Interfaces
         public Task<Response> GetUsers(int page, int limit);
 
         /// <summary>
-        /// Добавление пользователя
+        /// Создание нового пользователя
         /// </summary>
-        /// <param name="user">Объект пользователь</param>
+        /// <param name="login">Логин пользователя</param>
+        /// <param name="password">Пароль пользователя</param>
+        /// <param name="isAdmin">Будет ли пользователь админом</param>
         /// <returns>Объект Response</returns>
-        public Task<Response> AddUser(User user);
+        public Task<Response> AddUser(string login, string password, bool isAdmin);
 
         /// <summary>
         /// Удаление пользователя

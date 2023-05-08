@@ -1,4 +1,4 @@
-﻿namespace UsersAPI.DbContext
+﻿namespace UsersAPI.Data
 {
     using Microsoft.EntityFrameworkCore;
     using UsersAPI.Models;

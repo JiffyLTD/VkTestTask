@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using UsersAPI.DbContext;
+using UsersAPI.Data;
 using UsersAPI.Repositories;
 using UsersAPI.Repositories.Interfaces;
+using UsersAPI.Validations;
+using UsersAPI.Validations.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +18,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Регистрируем сервис
+// Регистрируем сервисы
 builder.Services.AddScoped<IUser, UserRepository>();
+builder.Services.AddScoped<IUserValidator, UserValidator>();
 
 var app = builder.Build();
+
+// Решаем проблему с типом Datetime в Postgre
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

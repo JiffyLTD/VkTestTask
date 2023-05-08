@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UsersAPI.DbContext;
+using UsersAPI.Data;
 using UsersAPI.Models;
 using UsersAPI.Repositories.Interfaces;
 
@@ -14,14 +14,16 @@ namespace UsersAPI.Repositories
             _db = db;
         }
 
-        public async Task<Response> AddUser(User user)
+        public async Task<Response> AddUser(string login, string password, bool isAdmin)
         {
             try
             {
+                var user = new User(login, password, isAdmin);
+
                 await _db.Users.AddAsync(user);
                 await _db.SaveChangesAsync();
 
-                return new Response("Пользователь успешно добавлен", true);
+                return new Response("Пользователь успешно добавлен", true, user);
             }
             catch (Exception ex)
             {
@@ -36,7 +38,7 @@ namespace UsersAPI.Repositories
                 user.UserState.Code = "Blocked";
                 await _db.SaveChangesAsync();
 
-                return new Response("Пользователь успешно удален", true);
+                return new Response("Пользователь успешно удален", true, user);
             }
             catch (Exception ex)
             {
@@ -44,11 +46,29 @@ namespace UsersAPI.Repositories
             }
         }
 
-        public async Task<Response> GetUserByLogin(string login)
+        public async Task<Response> GetLastUserByLogin(string login)
         {
             try
             {
-                var user = await _db.Users.FirstOrDefaultAsync(u => u.Login == login);
+                var user = await _db.Users.OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(x => x.Login == login);
+
+                if (user != null)
+                    return new Response("Пользователь найден", true, user);
+                else
+                    return new Response("Пользователь с таким логином не найден", false);
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message, false);
+            }
+        }
+
+        public async Task<Response> GetUserById(Guid id)
+        {
+            try
+            {
+                var user = await _db.Users.Include(x => x.UserGroup)
+                    .Include(x => x.UserState).FirstOrDefaultAsync(u => u.Id == id);
 
                 if (user != null) 
                     return new Response("Пользователь успешно найден", true, user);
@@ -65,7 +85,8 @@ namespace UsersAPI.Repositories
         {
             try
             {
-                var users = await _db.Users.ToListAsync();
+                var users = await _db.Users.Include(x => x.UserGroup)
+                    .Include(x => x.UserState).ToListAsync();
 
                 return new Response("Список пользователей", true, users);
             }
@@ -79,7 +100,8 @@ namespace UsersAPI.Repositories
         {
             try
             {
-                var allUsers = await _db.Users.ToListAsync();
+                var allUsers = await _db.Users.Include(x => x.UserGroup)
+                    .Include(x => x.UserState).ToListAsync();
 
                 var users = new List<User>();
 

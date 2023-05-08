@@ -8,15 +8,23 @@
             Status = status;
         }
 
-        public Response(string message, bool status, object @object)
+        public Response(string message, bool status, User user) 
         {
             Message = message;
             Status = status;
-            Object = @object;
+            User = user;
+        }
+
+        public Response(string message, bool status, List<User> users) 
+        {
+            Message = message;
+            Status = status;
+            Users = users;
         }
 
         public string Message { get; set; } = null!;
         public bool Status { get; set; }
-        public object Object { get; set; } = null!;
+        public User? User { get; set; }
+        public List<User>? Users { get; set; }
     }
 }
