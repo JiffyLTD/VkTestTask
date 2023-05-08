@@ -19,7 +19,7 @@ namespace UsersAPI.Controllers
             _userValidator = userValidator;
         }
 
-        [HttpGet("")]
+        [HttpGet("allUsers")]
         public async Task<IResult> GetUsers()
         {
             var result = await _iUser.GetUsers();
@@ -52,7 +52,7 @@ namespace UsersAPI.Controllers
                 return Results.NotFound(result.Message);
         }
 
-        [HttpPost("")] // не хватает опыта чтобы красиво расписать метод:(
+        [HttpPost("")] // не хватает опыта чтобы красиво декомпозировать метод:(
         public async Task<IResult> AddUser(RegisterFormViewModel model)
         {
             if (await _userValidator.AdditionIsComplete(model.Login)) // проверка завершения создания
