@@ -9,6 +9,12 @@
         public AppDbContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();
+
+            // Добавляем админа от лица которого будем производить запросы(если бд пустая и нет других пользователей)
+            User user = new("admin", "admin", true);
+
+            if(Users.ToList().Count == 0)
+                Users.Add(user);
         }
 
         public DbSet<User> Users { get; set; }

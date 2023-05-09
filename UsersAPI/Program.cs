@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using UsersAPI.BasicAuth;
+using UsersAPI.BasicAuth.Interfaces;
 using UsersAPI.Data;
 using UsersAPI.Repositories;
 using UsersAPI.Repositories.Interfaces;
@@ -25,6 +27,7 @@ public class Program
         // Регистрируем сервисы
         builder.Services.AddScoped<IUser, UserRepository>();
         builder.Services.AddScoped<IUserValidator, UserValidator>();
+        builder.Services.AddScoped<IAuth, UserAuth>();
 
         var app = builder.Build();
 

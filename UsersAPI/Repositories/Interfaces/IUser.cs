@@ -11,6 +11,13 @@ namespace UsersAPI.Repositories.Interfaces
         public Task<int> NumOfAdmins();
 
         /// <summary>
+        /// Получение пользователя по логину
+        /// </summary>
+        /// <param name="login">Логин пользователя</param>
+        /// <returns>Объект Response</returns>
+        public Task<Response> GetUserByLogin(string login);
+
+        /// <summary>
         /// Получение последнего добавленного(по времени создания) пользователя
         /// </summary>
         /// <param name="login">Логин пользователя</param>

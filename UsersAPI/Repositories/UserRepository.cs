@@ -87,6 +87,24 @@ namespace UsersAPI.Repositories
             }
         }
 
+        public async Task<Response> GetUserByLogin(string login)
+        {
+            try
+            {
+                var user = await _db.Users.Include(x => x.UserGroup)
+                    .Include(x => x.UserState).FirstOrDefaultAsync(u => u.Login == login);
+
+                if (user != null)
+                    return new Response("Пользователь успешно найден", true, user);
+                else
+                    return new Response("Пользователь не найден", false);
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message, false);
+            }
+        }
+
         public async Task<Response> GetUsers()
         {
             try
