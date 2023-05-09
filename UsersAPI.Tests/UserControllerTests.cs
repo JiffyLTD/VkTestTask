@@ -17,7 +17,7 @@ namespace UsersAPI.Tests
         }
 
         [Theory]
-        [InlineData("api/v1/users")]
+        [InlineData("api/v1/users?login=admin&password=admin")]
         public async void POST_AddUser_Test(string url)
         {
             // Arrange
@@ -33,24 +33,19 @@ namespace UsersAPI.Tests
             Thread.Sleep(5000);
             var responseUserThree = await client.PostAsJsonAsync(url, userModels[2]); // добавл€ем пользовател€ с таким же логином через 5 секунд -
                                                                                       // получаем BadRequest(ќшибка создани€. ƒанный логин уже зан€т)
-            var responseAdmin = await client.PostAsJsonAsync(url, userModels[3]); // добавл€ем первого админа получаем Success
-            var responseAdminTwo = await client.PostAsJsonAsync(url, userModels[4]); // добавл€ем второго админа получаем BadRequest(ќшибка создани€.
+            var responseAdmin = await client.PostAsJsonAsync(url, userModels[3]); // добавл€ем второго админа получаем BadRequest(ќшибка создани€.
                                                                                      //  оличество администраторов в системе не более 1)
 
             var jsonResponseUser = await responseUser.Content.ReadFromJsonAsync<JsonResponse>();
             var user = jsonResponseUser.User;
-            var jsonResponseAdmin = await responseAdmin.Content.ReadFromJsonAsync<JsonResponse>();
-            var admin = jsonResponseAdmin.User;
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, responseUser.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, responseUserTwo.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, responseUserThree.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, responseAdmin.StatusCode);
-            Assert.Equal(HttpStatusCode.BadRequest, responseAdminTwo.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, responseAdmin.StatusCode);
 
             Assert.Equal("User", user.UserGroup.Code);
-            Assert.Equal("Admin", admin.UserGroup.Code);
         }
 
         [Fact]
@@ -66,11 +61,11 @@ namespace UsersAPI.Tests
             };
 
             // Act
-            var responseUser = await client.PostAsJsonAsync("api/v1/users", userModel);// создаем пользовател€ чтобы потом удалить
+            var responseUser = await client.PostAsJsonAsync("api/v1/users?login=admin&password=admin", userModel);// создаем пользовател€ чтобы потом удалить
             var jsonResponse = await responseUser.Content.ReadFromJsonAsync<JsonResponse>();
             var user = jsonResponse.User;
 
-            var response = await client.DeleteAsync($"api/v1/users?id={user.Id}");
+            var response = await client.DeleteAsync($"api/v1/users?id={user.Id}&login=admin&password=admin");
             var jsonResponseAfterDelete = await response.Content.ReadFromJsonAsync<JsonResponse>();
             var userAfterDelete = jsonResponseAfterDelete.User;
 
@@ -88,7 +83,7 @@ namespace UsersAPI.Tests
             var client = _factory.CreateClient();
 
             // Act
-            var responseUser = await client.PostAsJsonAsync("api/v1/users",// создаем пользовател€ чтобы потом получить
+            var responseUser = await client.PostAsJsonAsync("api/v1/users?login=admin&password=admin",// создаем пользовател€ чтобы потом получить
                new RegisterFormViewModel()
                {
                    Login = "Login1",
@@ -97,18 +92,20 @@ namespace UsersAPI.Tests
                });
             var jsonResponse = await responseUser.Content.ReadFromJsonAsync<JsonResponse>();
             var user = jsonResponse.User;
-            var response = await client.GetAsync($"api/v1/users/getById?id={user.Id}");
+            var response = await client.GetAsync($"api/v1/users/getById?id={user.Id}&login=admin&password=admin");
+            var badResponse = await client.GetAsync($"api/v1/users/getById?id={user.Id}&12345&12345");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, badResponse.StatusCode);
             Assert.Equal("Login1", user.Login);
             Assert.Equal("Active", user.UserState.Code);
             Assert.Equal("User", user.UserGroup.Code);
         }
 
         [Theory]
-        [InlineData("api/v1/users/allUsers")]
-        [InlineData("api/v1/users/1&1")]
+        [InlineData("api/v1/users/allUsers?login=admin&password=admin")]
+        [InlineData("api/v1/users/1&1?login=admin&password=admin")]
         public async void GET_GetAll_Test(string url)
         {
             // Arrange
@@ -145,12 +142,6 @@ namespace UsersAPI.Tests
                     Login = "user",
                     Password = "userThree",
                     IsAdmin = false
-                },
-                new RegisterFormViewModel
-                {
-                    Login = "admin",
-                    Password = "admin",
-                    IsAdmin = true
                 },
                 new RegisterFormViewModel
                 {

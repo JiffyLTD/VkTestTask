@@ -15,6 +15,8 @@
 
             if(Users.ToList().Count == 0)
                 Users.Add(user);
+
+            SaveChanges();
         }
 
         public DbSet<User> Users { get; set; }
