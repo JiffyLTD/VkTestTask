@@ -24,10 +24,7 @@ namespace UsersAPI.Controllers
         {
             var result = await _iUser.GetUsers();
 
-            if (result.Status)
-                return Results.Ok(result);
-            else
-                return Results.Problem(result.Message);
+            return result.Status ? Results.Ok(result) : Results.Problem(result.Message);
         }
 
         [HttpGet("{page:int}&{limit:int}")]
@@ -35,10 +32,7 @@ namespace UsersAPI.Controllers
         {
             var result = await _iUser.GetUsers(page, limit);
 
-            if (result.Status)
-                return Results.Ok(result);
-            else
-                return Results.Problem(result.Message);
+            return result.Status ? Results.Ok(result) : Results.Problem(result.Message);
         }
 
         [HttpGet("getById")]
@@ -46,10 +40,7 @@ namespace UsersAPI.Controllers
         {
             var result = await _iUser.GetUserById(id);
 
-            if(result.Status)
-                return Results.Ok(result);
-            else
-                return Results.NotFound(result.Message);
+            return result.Status ? Results.Ok(result) : Results.Problem(result.Message);
         }
 
         [HttpPost("")]
@@ -89,10 +80,7 @@ namespace UsersAPI.Controllers
         {
             var result = await _iUser.DeleteUser(id);
 
-            if(result.Status)
-                return Results.Ok(result);
-            else
-                return Results.Problem(result.Message);
+            return result.Status ? Results.Ok(result) : Results.Problem(result.Message);
         }
     }
 }

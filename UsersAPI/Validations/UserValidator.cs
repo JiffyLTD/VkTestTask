@@ -1,4 +1,6 @@
-﻿using UsersAPI.Repositories.Interfaces;
+﻿using UsersAPI.Models;
+using UsersAPI.Models.ViewModels;
+using UsersAPI.Repositories.Interfaces;
 using UsersAPI.Validations.Interfaces;
 
 namespace UsersAPI.Validations
@@ -17,12 +19,7 @@ namespace UsersAPI.Validations
             var result = await _iUser.GetLastUserByLogin(login);
 
             if (result.Status && result.User != null)
-            {
-                if (AdditionTimeIsOver(result.User.CreatedDate))
-                    return true;
-                else
-                    return false;
-            }
+                    return AdditionTimeIsOver(result.User.CreatedDate);
 
             return true;
         }
@@ -41,7 +38,24 @@ namespace UsersAPI.Validations
         {
             var result = await _iUser.GetLastUserByLogin(login);
 
-            return result.Status ? false : true;
+            return !result.Status;
+        }
+
+        public async Task<Response> ValidateInput(RegisterFormViewModel model)
+        {
+            if (!await AdditionIsComplete(model.Login))
+                return new Response("Ошибка создания. Повторите попытку позже", false);
+
+            // Проверить уникальность логина
+            if (!await LoginIsUniq(model.Login))
+                return new Response("Ошибка создания. Данный логин уже занят", false);
+
+            // Проверить количество администраторов в системе
+            if (model.IsAdmin && !await AdminPlaceIsEmpty())
+                return new Response("Ошибка создания. Количество администраторов в системе не более 1", false);
+
+            // Вернуть успешный результат
+            return new Response("", true);
         }
     }
 }
