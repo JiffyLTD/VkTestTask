@@ -28,11 +28,14 @@ namespace UsersAPI.Tests
 
             // Act
             var responseUser = await client.PostAsJsonAsync(url, userModels[0]); // добавляем пользователя получаем Success
-            var responseUserTwo = await client.PostAsJsonAsync(url, userModels[1]); // добавляем пользователя с таким же логином - получаем BadRequest(Ошибка создания. Повторите попытку позже)
+            var responseUserTwo = await client.PostAsJsonAsync(url, userModels[1]); // добавляем пользователя с таким же логином -
+                                                                                    // получаем BadRequest(Ошибка создания. Повторите попытку позже)
             Thread.Sleep(5000);
-            var responseUserThree = await client.PostAsJsonAsync(url, userModels[2]); // добавляем пользователя с таким же логином через 5 секунд - получаем BadRequest(Ошибка создания. Данный логин уже занят)
+            var responseUserThree = await client.PostAsJsonAsync(url, userModels[2]); // добавляем пользователя с таким же логином через 5 секунд -
+                                                                                      // получаем BadRequest(Ошибка создания. Данный логин уже занят)
             var responseAdmin = await client.PostAsJsonAsync(url, userModels[3]); // добавляем первого админа получаем Success
-            var responseAdminTwo = await client.PostAsJsonAsync(url, userModels[4]); // добавляем второго админа получаем BadRequest(Ошибка создания. Количество администраторов в системе не более 1)
+            var responseAdminTwo = await client.PostAsJsonAsync(url, userModels[4]); // добавляем второго админа получаем BadRequest(Ошибка создания.
+                                                                                     // Количество администраторов в системе не более 1)
 
             var jsonResponseUser = await responseUser.Content.ReadFromJsonAsync<JsonResponse>();
             var user = jsonResponseUser.User;

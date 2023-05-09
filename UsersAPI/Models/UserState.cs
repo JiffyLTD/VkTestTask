@@ -10,6 +10,7 @@
             Id = Guid.NewGuid();
             Code = "Active";
         }
+
         /// <summary>
         /// Конструктор для создания состояния пользователя 
         /// </summary>

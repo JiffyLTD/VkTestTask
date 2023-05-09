@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UsersAPI.Models;
 using UsersAPI.Models.ViewModels;
 using UsersAPI.Repositories.Interfaces;
 using UsersAPI.Validations.Interfaces;
@@ -46,6 +45,7 @@ namespace UsersAPI.Controllers
         [HttpPost("")]
         public async Task<IResult> AddUser(RegisterFormViewModel model)
         {
+            // Валидация модели
             var validationResult = await _userValidator.ValidateInput(model);
 
             if (!validationResult.Status) return Results.BadRequest(validationResult.Message);
