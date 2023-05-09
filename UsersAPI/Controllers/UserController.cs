@@ -46,7 +46,7 @@ namespace UsersAPI.Controllers
         [HttpPost("")]
         public async Task<IResult> AddUser(RegisterFormViewModel model)
         {
-            var validationResult = await ValidateInput(model);
+            var validationResult = await _userValidator.ValidateInput(model);
 
             if (!validationResult.Status) return Results.BadRequest(validationResult.Message);
 
@@ -56,23 +56,6 @@ namespace UsersAPI.Controllers
                 return Results.Problem(addUserResult.Message);
 
             return Results.Ok(addUserResult);
-        }
-
-        private async Task<Response> ValidateInput(RegisterFormViewModel model)
-        { 
-            if (!await _userValidator.AdditionIsComplete(model.Login))
-                return new Response("Ошибка создания. Повторите попытку позже", false);
-
-            // Проверить уникальность логина
-            if (!await _userValidator.LoginIsUniq(model.Login))
-                return new Response("Ошибка создания. Данный логин уже занят", false);
-
-            // Проверить количество администраторов в системе
-            if (model.IsAdmin && !await _userValidator.AdminPlaceIsEmpty())
-                return new Response("Ошибка создания. Количество администраторов в системе не более 1", false);
-
-            // Вернуть успешный результат
-            return new Response("", true);
         }
 
         [HttpDelete("")]
