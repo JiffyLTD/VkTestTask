@@ -41,10 +41,7 @@ namespace UsersAPI.Validations
         {
             var result = await _iUser.GetLastUserByLogin(login);
 
-            if (result.Status)
-                return false; 
-            else
-                return true;
+            return result.Status ? false : true;
         }
     }
 }

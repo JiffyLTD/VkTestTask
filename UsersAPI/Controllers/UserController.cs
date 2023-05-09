@@ -52,42 +52,36 @@ namespace UsersAPI.Controllers
                 return Results.NotFound(result.Message);
         }
 
-        [HttpPost("")] // не хватает опыта чтобы красиво декомпозировать метод:(
+        [HttpPost("")]
         public async Task<IResult> AddUser(RegisterFormViewModel model)
         {
-            if (await _userValidator.AdditionIsComplete(model.Login)) // проверка завершения создания
-            {
-                if (await _userValidator.LoginIsUniq(model.Login)) // проверка уникальности логина
-                {
-                    if (model.IsAdmin) // если пользователь указал что будет админом
-                    {
-                        if (await _userValidator.AdminPlaceIsEmpty()) // проверка есть ли админы в системе
-                        {
-                            var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+            var validationResult = await ValidateInput(model);
 
-                            if (result.Status)
-                                return Results.Ok(result);
-                            else
-                                return Results.Problem(result.Message);
-                        }
+            if (!validationResult.Status) return Results.BadRequest(validationResult.Message);
 
-                        return Results.BadRequest("Ошибка создания. Количество администраторов в системе не более 1");
-                    }
-                    else // если пользователь указал что не будет админом
-                    {
-                        var result = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+            // Добавить пользователя в систему
+            var addUserResult = await _iUser.AddUser(model.Login, model.Password, model.IsAdmin);
+            if (!addUserResult.Status)
+                return Results.Problem(addUserResult.Message);
 
-                        if (result.Status)  
-                            return Results.Ok(result);
-                        else
-                            return Results.Problem(result.Message);
-                    }
-                }
+            return Results.Ok(addUserResult);
+        }
 
-                return Results.BadRequest("Ошибка создания. Данный логин уже занят");
-            }
+        private async Task<Response> ValidateInput(RegisterFormViewModel model)
+        { 
+            if (!await _userValidator.AdditionIsComplete(model.Login))
+                return new Response("Ошибка создания. Повторите попытку позже", false);
 
-            return Results.BadRequest("Ошибка создания. Повторите попытку позже");
+            // Проверить уникальность логина
+            if (!await _userValidator.LoginIsUniq(model.Login))
+                return new Response("Ошибка создания. Данный логин уже занят", false);
+
+            // Проверить количество администраторов в системе
+            if (model.IsAdmin && !await _userValidator.AdminPlaceIsEmpty())
+                return new Response("Ошибка создания. Количество администраторов в системе не более 1", false);
+
+            // Вернуть успешный результат
+            return new Response("", true);
         }
 
         [HttpDelete("")]
